@@ -1,69 +1,35 @@
 import 'package:flutter/material.dart';
-import 'lib/services/api_service.dart'; // Import API service
+import 'package:google_fonts/google_fonts.dart';
+import 'screens/splash_screen.dart';
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: RecipeScreen(), // ✅ Make sure this is the starting screen
-    );
-  }
-}
-
-class RecipeScreen extends StatefulWidget {
-  @override
-  _RecipeScreenState createState() => _RecipeScreenState();
-}
-
-class _RecipeScreenState extends State<RecipeScreen> {
-  List<dynamic> recipes = [];
-  bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchRecipes();
-  }
-
-  Future<void> fetchRecipes() async {
-    try {
-      final data = await ApiService.fetchRecipes("pasta"); // Test with "pasta"
-      setState(() {
-        recipes = data;
-        isLoading = false;
-      });
-    } catch (e) {
-      print("Error fetching recipes: $e");
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("QuickBites Recipes")),
-      body:
-          isLoading
-              ? Center(child: CircularProgressIndicator())
-              : ListView.builder(
-                itemCount: recipes.length,
-                itemBuilder: (context, index) {
-                  final recipe = recipes[index];
-                  return Card(
-                    child: ListTile(
-                      title: Text(recipe['title']),
-                      subtitle: Text(
-                        "Ready in ${recipe['readyInMinutes']} mins",
-                      ),
-                      leading: Image.network(recipe['image']),
-                    ),
-                  );
-                },
-              ),
+      theme: ThemeData(
+        brightness: Brightness.light,
+        colorScheme: ColorScheme.light(
+          primary: Color(0xFF337357),
+          secondary: Color(0xFFF3BABA),
+        ),
+        textTheme: GoogleFonts.poppinsTextTheme(),
+      ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        colorScheme: ColorScheme.dark(
+          primary: Color(0xFF1E1E1E),
+          secondary: Color(0xFFF3BABA),
+        ),
+        textTheme: GoogleFonts.poppinsTextTheme(),
+      ),
+      home: SplashScreen(),
     );
   }
 }

@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:finalproject/lib/services/api_service.dart';
 
 class RecipeScreen extends StatefulWidget {
+  final String searchQuery;
+
+  // ✅ Make searchQuery optional with a default value
+  const RecipeScreen({super.key, this.searchQuery = "quick recipes"});
+
   @override
   _RecipeScreenState createState() => _RecipeScreenState();
 }
@@ -13,28 +18,28 @@ class _RecipeScreenState extends State<RecipeScreen> {
   @override
   void initState() {
     super.initState();
-    fetchRecipes();
+    fetchRecipes(widget.searchQuery);
   }
 
-  Future<void> fetchRecipes() async {
-    try {
-      final data = await ApiService.fetchRecipes("pasta"); // Test with "pasta"
-      setState(() {
-        recipes = data;
-        isLoading = false;
-      });
-    } catch (e) {
-      print("Error fetching recipes: $e");
-    }
+  Future<void> fetchRecipes(String query) async {
+    print("📡 Fetching recipes for: $query");
+    final data = await ApiService.fetchRecipes(query);
+
+    setState(() {
+      recipes = data;
+      isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("QuickBites Recipes")),
+      appBar: AppBar(title: Text("Recipes for ${widget.searchQuery}")),
       body:
           isLoading
               ? Center(child: CircularProgressIndicator())
+              : recipes.isEmpty
+              ? Center(child: Text("❌ No recipes found!"))
               : ListView.builder(
                 itemCount: recipes.length,
                 itemBuilder: (context, index) {
@@ -45,7 +50,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                       subtitle: Text(
                         "Ready in ${recipe['readyInMinutes']} mins",
                       ),
-                      leading: Image.network(recipe['image']),
+                      leading: Image.network(recipe['image'] ?? ''),
                     ),
                   );
                 },
